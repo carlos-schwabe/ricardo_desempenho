@@ -6,5 +6,5 @@ setup(
     description='Simplified aircraft performance model',
     author='Carlos Schwabe | João Vitor Lima | Luis Guilherme Burato',
     license='MIT',
-    install_requires=['pandas','numpy','math','fluids'],
+    install_requires=['pandas','numpy','fluids'],
 )

@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import math
 import fluids.atmosphere
+from collections import OrderedDict
 
 class aiplane_evaluator(object):
     """Airplane class creates an airplane object with all model characteristics adn creates an evaluator funcion of the net
@@ -16,9 +17,10 @@ class aiplane_evaluator(object):
         self.__name__=id
         self.ref_area=S
         self.aerodynamics={}
-        self.engines.st=0
-        self.engines.dTdh=0
-        self.engines.TSFC = 0
+        self.engines={}
+        self.engines['st']=0
+        self.engines['n']=0
+        self.engines['TSFC'] = 0
 
     def load_aerodynamics(self,polar_path):
         """Loads aerodynamic data from excel sheet: formating: sheet name: M=<mach number>, column names: AoA;CL;CDtot
@@ -40,9 +42,9 @@ class aiplane_evaluator(object):
             TSFC (float): thrust specific fuel consumption [kg/Nh]
         """
 
-        self.engine.st=static_trust
-        self.engine.n = n
-        self.engine.TSFC = TSFC
+        self.engines['st']=static_trust
+        self.engines['n'] = n
+        self.engines['TSFC'] = TSFC
 
     def add_friction(self,mu=0):
         """adds friction coefficient to the model
@@ -82,9 +84,10 @@ class aiplane_evaluator(object):
             raise('Mach out of range')
 
         #find upper and lower machs
-
-        for key, value in aero_sorted:
+        found=False
+        for key, value in aero_sorted.items():
             if key==mach:
+                found=True
                 aoa_array=np.array(aero_sorted[key]['AoA'].tolist())
                 CL_array=np.array(aero_sorted[key]['CL'].tolist())
                 CD_array=np.array(aero_sorted[key]['CDtot'].tolist())
@@ -95,7 +98,7 @@ class aiplane_evaluator(object):
                 ub_mach= key
                 ub_data= aero_sorted[key]
                 break
-        if not data:
+        if not found:
 
             #interpolate by mach
 
@@ -130,11 +133,11 @@ class aiplane_evaluator(object):
             Consumption(float): engine fuel consumption [Kg/h]
         """
         if req_thr:
-            max_thrust=self.engine.st*(atmos.rho/1.225)**self.engine.n
+            max_thrust=self.engines['st']*(atmos.rho/1.225)**self.engines['n']
             if req_thr>max_thrust:
                 raise ('Required Thrust Exceeds maximum thrust for the condition')
-            return req_thr, req_thr*self.engine.TSFC
+            return req_thr, req_thr*self.engines['TSFC']
         else:
-            thrust = engine_set*self.engine.st * (atmos.rho / 1.225) ** self.engine.n
-            consumption=thrust*self.engine.TSFC
-            return thrust consumption
+            thrust = engine_set*self.engines['st'] * (atmos.rho / 1.225) ** self.engines['n']
+            consumption=thrust*self.engines['TSFC']
+            return thrust,consumption
