@@ -1,0 +1,9 @@
+README.md
+setup.py
+acft_evaluators/Aircraft_evaluators.py
+acft_evaluators/__init__.py
+acft_evaluators.egg-info/PKG-INFO
+acft_evaluators.egg-info/SOURCES.txt
+acft_evaluators.egg-info/dependency_links.txt
+acft_evaluators.egg-info/requires.txt
+acft_evaluators.egg-info/top_level.txt
